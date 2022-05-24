@@ -1,6 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { UsersService } from './users.service';
+import { Request } from 'express';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('api/users')
 export class UsersController {
@@ -14,6 +26,12 @@ export class UsersController {
   @Get()
   findAll() {
     return this.usersService.users({});
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/me')
+  getFromToken(@Req() req: Request) {
+    return this.usersService.user({ id: req.user['id'] });
   }
 
   @Get(':id')
